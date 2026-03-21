@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Family {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members          FamilyMember[]
+  transactions     Transaction[]
+  categories       Category[]
+  assets           Asset[]
+  budgets          Budget[]
+  investmentConfig InvestmentConfig?
+  dashboardLayouts DashboardLayout[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  familyMemberships FamilyMember[]
+  transactions      Transaction[]
+  refreshTokens     RefreshToken[]
+  dashboardLayouts  DashboardLayout[]
+}
+
+model FamilyMember {
+  id       String @id @default(uuid())
+  role     String @default("MEMBER")
+  joinedAt DateTime @default(now())
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyId String
+  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, familyId])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id       String  @id @default(uuid())
+  name     String
+  icon     String?
+  color    String?
+  type     String
+  isSystem Boolean @default(false)
+
+  familyId String?
+  family   Family? @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+
+  @@unique([name, familyId])
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  amount      Decimal  @db.Decimal(12, 2)
+  currency    String   @default("INR")
+  description String
+  date        DateTime
+  type        String
+  inputMethod String   @default("MANUAL")
+  receiptUrl  String?
+  ocrRawText  String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  familyId   String
+  family     Family   @relation(fields: [familyId], references: [id])
+
+  tags TransactionTag[]
+
+  @@index([familyId, date])
+  @@index([categoryId])
+  @@index([userId])
+}
+
+model TransactionTag {
+  id            String      @id @default(uuid())
+  tag           String
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@unique([tag, transactionId])
+}
+
+model Asset {
+  id            String    @id @default(uuid())
+  name          String
+  type          String
+  purchaseDate  DateTime?
+  purchaseValue Decimal?  @db.Decimal(14, 2)
+  currentValue  Decimal   @db.Decimal(14, 2)
+  currency      String    @default("INR")
+  description   String?
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  familyId String
+  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  valueHistory AssetValueHistory[]
+}
+
+model AssetValueHistory {
+  id      String   @id @default(uuid())
+  value   Decimal  @db.Decimal(14, 2)
+  date    DateTime
+  assetId String
+  asset   Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId, date])
+}
+
+model Budget {
+  id         String  @id @default(uuid())
+  month      Int
+  year       Int
+  amount     Decimal @db.Decimal(12, 2)
+  categoryId String?
+  familyId   String
+  family     Family  @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@unique([familyId, month, year, categoryId])
+}
+
+model DashboardLayout {
+  id       String @id @default(uuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  familyId String
+  family   Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  layout   Json
+
+  @@unique([userId, familyId])
+}
+
+model InvestmentConfig {
+  id                 String  @id @default(uuid())
+  familyId           String  @unique
+  family             Family  @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  savingsPercentage  Decimal @db.Decimal(5, 2)
+  expectedReturnRate Decimal @db.Decimal(5, 2)
+  projectionYears    Int     @default(10)
+}

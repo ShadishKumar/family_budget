@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Family Budget Tracker",
+    "slug": "family-budget-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#2563eb"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.familybudget.tracker",
+      "infoPlist": {
+        "NSCameraUsageDescription": "We need camera access to scan receipts",
+        "NSMicrophoneUsageDescription": "We need microphone access for voice input",
+        "NSSpeechRecognitionUsageDescription": "We need speech recognition for voice input"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#2563eb"
+      },
+      "package": "com.familybudget.tracker",
+      "permissions": ["CAMERA", "RECORD_AUDIO"]
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-image-picker"
+    ]
+  }
+}
