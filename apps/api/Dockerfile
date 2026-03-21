@@ -1,5 +1,8 @@
 FROM node:20-alpine AS base
 
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 # Copy root package files
@@ -26,6 +29,9 @@ RUN cd apps/api && npx tsc
 
 # Production stage
 FROM node:20-alpine AS production
+
+# Install OpenSSL for Prisma runtime
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
