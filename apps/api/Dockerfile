@@ -42,15 +42,13 @@ COPY --from=base /app/apps/api/package.json ./apps/api/
 RUN npm ci --workspace=packages/shared --workspace=apps/api --include-workspace-root --omit=dev
 
 COPY --from=base /app/packages/shared/dist/ ./packages/shared/dist/
+COPY --from=base /app/packages/shared/package.json ./packages/shared/
 COPY --from=base /app/apps/api/dist/ ./apps/api/dist/
 COPY --from=base /app/apps/api/prisma/ ./apps/api/prisma/
 COPY --from=base /app/node_modules/.prisma/ ./node_modules/.prisma/
 COPY --from=base /app/node_modules/@prisma/ ./node_modules/@prisma/
 
-# Need tsx for seeding
-RUN npm install -g tsx
-
 ENV NODE_ENV=production
 EXPOSE 3001
 
-CMD ["sh", "-c", "cd /app/apps/api && npx prisma db push --accept-data-loss && npx tsx prisma/seed.ts; exec node dist/index.js"]
+CMD ["sh", "-c", "cd /app/apps/api && npx prisma db push --accept-data-loss 2>&1 && echo 'DB schema pushed'; exec node dist/index.js"]
