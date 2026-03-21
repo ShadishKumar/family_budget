@@ -51,4 +51,5 @@ COPY --from=base /app/node_modules/@prisma/ ./node_modules/@prisma/
 ENV NODE_ENV=production
 EXPOSE 3001
 
-CMD ["sh", "-c", "cd /app/apps/api && (npx prisma db push --accept-data-loss &) && exec node dist/index.js"]
+WORKDIR /app/apps/api
+CMD ["node", "dist/index.js"]
