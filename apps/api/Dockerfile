@@ -53,7 +53,4 @@ RUN npm install -g tsx
 ENV NODE_ENV=production
 EXPOSE 3001
 
-COPY apps/api/start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
-CMD ["/app/start.sh"]
+CMD ["sh", "-c", "cd /app/apps/api && npx prisma db push --accept-data-loss 2>&1 && npx tsx prisma/seed.ts 2>&1; node dist/index.js"]
