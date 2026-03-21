@@ -1,4 +1,5 @@
-import { Transaction, formatCurrency, formatDate } from '@family-budget/shared';
+import { Transaction, formatDate } from '@family-budget/shared';
+import { useCurrency } from '../../hooks/useCurrency';
 import { Trash2, Edit, Mic, Camera, Keyboard } from 'lucide-react';
 import { useDeleteTransaction } from '../../api/hooks/useTransactions';
 
@@ -13,6 +14,7 @@ const inputMethodIcon = {
 };
 
 export default function TransactionList({ transactions }: TransactionListProps) {
+  const { formatCurrency } = useCurrency();
   const deleteTransaction = useDeleteTransaction();
 
   if (transactions.length === 0) {

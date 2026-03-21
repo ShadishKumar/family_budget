@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import Header from '../components/layout/Header';
 import { useInvestmentConfig, useInvestmentProjection, useUpdateInvestmentConfig } from '../api/hooks/useInvestments';
-import { formatCurrency } from '@family-budget/shared';
+import { useCurrency } from '../hooks/useCurrency';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Lightbulb, Settings, TrendingUp } from 'lucide-react';
 
 export default function Investments() {
+  const { formatCurrency } = useCurrency();
   const { data: config } = useInvestmentConfig();
   const { data: projection } = useInvestmentProjection();
   const updateConfig = useUpdateInvestmentConfig();

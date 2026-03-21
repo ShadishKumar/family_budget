@@ -1,4 +1,5 @@
-import { formatCurrency, formatDate } from '@family-budget/shared';
+import { formatDate } from '@family-budget/shared';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface RecentTransactionsProps {
   transactions: {
@@ -12,6 +13,8 @@ interface RecentTransactionsProps {
 }
 
 export default function RecentTransactions({ transactions }: RecentTransactionsProps) {
+  const { formatCurrency } = useCurrency();
+
   return (
     <div className="card h-full">
       <h3 className="text-sm font-semibold text-gray-700 mb-4">Recent Transactions</h3>

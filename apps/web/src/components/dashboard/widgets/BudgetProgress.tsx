@@ -1,4 +1,4 @@
-import { formatCurrency } from '@family-budget/shared';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface BudgetItem {
   categoryName: string;
@@ -12,6 +12,8 @@ interface BudgetProgressProps {
 }
 
 export default function BudgetProgress({ data }: BudgetProgressProps) {
+  const { formatCurrency } = useCurrency();
+
   return (
     <div className="card h-full">
       <h3 className="text-sm font-semibold text-gray-700 mb-4">Spending by Category</h3>

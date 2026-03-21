@@ -3,13 +3,15 @@ import Header from '../components/layout/Header';
 import TransactionList from '../components/transactions/TransactionList';
 import TransactionForm from '../components/transactions/TransactionForm';
 import { useTransactions, useTransactionSummary } from '../api/hooks/useTransactions';
-import { formatCurrency, getCurrentMonthRange } from '@family-budget/shared';
+import { getCurrentMonthRange } from '@family-budget/shared';
+import { useCurrency } from '../hooks/useCurrency';
 import { Plus, Filter } from 'lucide-react';
 
 export default function Transactions() {
   const [showForm, setShowForm] = useState(false);
   const [filters, setFilters] = useState<{ type?: 'INCOME' | 'EXPENSE'; page: number }>({ page: 1 });
 
+  const { formatCurrency } = useCurrency();
   const { start, end } = getCurrentMonthRange();
   const { data } = useTransactions({ ...filters, limit: 20 });
   const { data: summary } = useTransactionSummary(start, end);

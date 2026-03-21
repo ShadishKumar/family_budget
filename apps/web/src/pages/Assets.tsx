@@ -2,7 +2,8 @@ import { useState } from 'react';
 import Header from '../components/layout/Header';
 import AssetForm from '../components/assets/AssetForm';
 import { useAssets, useNetWorth, useDeleteAsset } from '../api/hooks/useAssets';
-import { formatCurrency, formatDate } from '@family-budget/shared';
+import { formatDate } from '@family-budget/shared';
+import { useCurrency } from '../hooks/useCurrency';
 import { Plus, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 
 const typeLabels: Record<string, string> = {
@@ -26,6 +27,7 @@ const typeColors: Record<string, string> = {
 };
 
 export default function Assets() {
+  const { formatCurrency } = useCurrency();
   const [showForm, setShowForm] = useState(false);
   const { data: assets = [] } = useAssets();
   const { data: netWorth } = useNetWorth();

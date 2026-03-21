@@ -1,11 +1,12 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { formatCurrency } from '@family-budget/shared';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface MonthlyTrendLineProps {
   data: { month: string; income: number; expenses: number }[];
 }
 
 export default function MonthlyTrendLine({ data }: MonthlyTrendLineProps) {
+  const { formatCurrency } = useCurrency();
   const trendData = data.map((d) => ({
     ...d,
     savings: d.income - d.expenses,

@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import { formatCurrency } from '@family-budget/shared';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface NetSavingsCardProps {
   totalIncome: number;
@@ -7,6 +7,7 @@ interface NetSavingsCardProps {
 }
 
 export default function NetSavingsCard({ totalIncome, totalExpenses }: NetSavingsCardProps) {
+  const { formatCurrency } = useCurrency();
   const netSavings = totalIncome - totalExpenses;
   const savingsRate = totalIncome > 0 ? (netSavings / totalIncome) * 100 : 0;
   const isPositive = netSavings >= 0;

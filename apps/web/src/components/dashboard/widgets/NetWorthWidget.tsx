@@ -1,5 +1,5 @@
 import { Landmark } from 'lucide-react';
-import { formatCurrency } from '@family-budget/shared';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface NetWorthWidgetProps {
   totalAssets: number;
@@ -17,6 +17,8 @@ const typeLabels: Record<string, string> = {
 };
 
 export default function NetWorthWidget({ totalAssets, assetsByType }: NetWorthWidgetProps) {
+  const { formatCurrency } = useCurrency();
+
   return (
     <div className="card h-full">
       <h3 className="text-sm font-semibold text-gray-700 mb-3">Net Worth</h3>

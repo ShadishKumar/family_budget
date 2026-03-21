@@ -3,7 +3,7 @@ import { useAuthStore } from '../store/authStore';
 import { CURRENCIES } from '@family-budget/shared';
 
 export default function Settings() {
-  const { user } = useAuthStore();
+  const { user, currency, setCurrency } = useAuthStore();
 
   return (
     <div>
@@ -28,7 +28,11 @@ export default function Settings() {
           <h3 className="font-semibold text-gray-900 mb-4">Preferences</h3>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Default Currency</label>
-            <select className="input-field w-48">
+            <select
+              className="input-field w-48"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            >
               {CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.symbol} {c.name} ({c.code})

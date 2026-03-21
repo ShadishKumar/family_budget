@@ -1,11 +1,12 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { formatCurrency } from '@family-budget/shared';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface CategoryPieChartProps {
   data: { categoryName: string; total: number; color?: string }[];
 }
 
 export default function CategoryPieChart({ data }: CategoryPieChartProps) {
+  const { formatCurrency } = useCurrency();
   const COLORS = ['#4CAF50', '#FF9800', '#E91E63', '#9C27B0', '#2196F3', '#00BCD4', '#795548', '#607D8B'];
 
   return (

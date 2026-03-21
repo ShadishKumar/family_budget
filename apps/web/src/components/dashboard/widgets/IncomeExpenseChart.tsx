@@ -1,11 +1,13 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { formatCurrency } from '@family-budget/shared';
+import { useCurrency } from '../../../hooks/useCurrency';
 
 interface IncomeExpenseChartProps {
   data: { month: string; income: number; expenses: number }[];
 }
 
 export default function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
+  const { formatCurrency } = useCurrency();
+
   return (
     <div className="card h-full">
       <h3 className="text-sm font-semibold text-gray-700 mb-4">Income vs Expenses</h3>
