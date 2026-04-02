@@ -1,4 +1,4 @@
-import { Transaction, formatDate } from '@family-budget/shared';
+import { Transaction, formatDate, formatCurrency as fmtCurrency } from '@family-budget/shared';
 import { useCurrency } from '../../hooks/useCurrency';
 import { Trash2, Edit, Mic, Camera, Keyboard } from 'lucide-react';
 import { useDeleteTransaction } from '../../api/hooks/useTransactions';
@@ -59,8 +59,13 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                 }`}
               >
                 {tx.type === 'INCOME' ? '+' : '-'}
-                {formatCurrency(tx.amount)}
+                {formatCurrency(Number(tx.amount))}
               </p>
+              {tx.originalCurrency && tx.originalCurrency !== tx.currency && (
+                <p className="text-xs text-gray-400">
+                  {fmtCurrency(Number(tx.originalAmount), tx.originalCurrency)}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center gap-1">

@@ -47,7 +47,7 @@ export function requireFamily(req: AuthRequest, res: Response, next: NextFunctio
   next();
 }
 
-export async function requireRole(roles: string[]) {
+export function requireRole(roles: string[]) {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !req.familyId) {
       return res.status(403).json({ error: 'Unauthorized' });

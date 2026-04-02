@@ -8,6 +8,9 @@ export interface Transaction {
   id: string;
   amount: number;
   currency: string;
+  originalAmount?: number;
+  originalCurrency?: string;
+  exchangeRate?: number;
   description: string;
   date: string;
   type: TransactionType;

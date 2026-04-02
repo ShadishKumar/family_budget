@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useCategories } from '../../api/hooks/useCategories';
 import { useCreateTransaction } from '../../api/hooks/useTransactions';
-import { CreateTransactionInput, TransactionType, Category } from '@family-budget/shared';
+import { CreateTransactionInput, TransactionType, Category, CURRENCIES, getCurrencySymbol } from '@family-budget/shared';
+import { useAuthStore } from '../../store/authStore';
+import { convertCurrency } from '../../utils/exchangeRate';
 import VoiceInput from './VoiceInput';
 import ReceiptScanner from './ReceiptScanner';
 import { Mic, Camera, X } from 'lucide-react';
@@ -14,8 +16,9 @@ interface TransactionFormProps {
 export default function TransactionForm({ onClose, initialData }: TransactionFormProps) {
   const { data: categories = [] } = useCategories();
   const createTransaction = useCreateTransaction();
+  const globalCurrency = useAuthStore((s) => s.currency);
 
-  const [form, setForm] = useState<Partial<CreateTransactionInput>>({
+  const [form, setForm] = useState<Partial<CreateTransactionInput> & { transactionCurrency?: string }>({
     amount: undefined,
     description: '',
     date: new Date().toISOString().split('T')[0],
@@ -23,27 +26,57 @@ export default function TransactionForm({ onClose, initialData }: TransactionFor
     categoryId: '',
     inputMethod: 'MANUAL',
     notes: '',
+    transactionCurrency: globalCurrency,
     ...initialData,
   });
 
   const [showVoice, setShowVoice] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
 
   const filteredCategories = (categories as Category[]).filter(
-    (c) => c.type === form.type
+    (c: Category) => c.type === form.type
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const isDifferentCurrency = form.transactionCurrency !== globalCurrency;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.amount || !form.description || !form.categoryId || !form.date) return;
 
-    createTransaction.mutate(form as CreateTransactionInput, {
-      onSuccess: () => onClose(),
-    });
+    setIsConverting(true);
+    try {
+      let finalAmount = form.amount;
+      let originalAmount: number | undefined;
+      let originalCurrency: string | undefined;
+      let exchangeRate: number | undefined;
+
+      if (isDifferentCurrency && form.transactionCurrency) {
+        const result = await convertCurrency(form.amount, form.transactionCurrency, globalCurrency);
+        finalAmount = result.convertedAmount;
+        exchangeRate = result.exchangeRate;
+        originalAmount = form.amount;
+        originalCurrency = form.transactionCurrency;
+      }
+
+      createTransaction.mutate(
+        {
+          ...form,
+          amount: finalAmount,
+          currency: globalCurrency,
+          originalAmount,
+          originalCurrency,
+          exchangeRate,
+        } as CreateTransactionInput,
+        { onSuccess: () => onClose() }
+      );
+    } finally {
+      setIsConverting(false);
+    }
   };
 
   const handleVoiceResult = (data: { amount?: number; description?: string; type?: TransactionType }) => {
-    setForm((prev) => ({
+    setForm((prev: any) => ({
       ...prev,
       ...(data.amount && { amount: data.amount }),
       ...(data.description && { description: data.description }),
@@ -60,9 +93,9 @@ export default function TransactionForm({ onClose, initialData }: TransactionFor
     suggestedCategory?: string;
   }) => {
     const matchedCategory = (categories as Category[]).find(
-      (c) => c.name === data.suggestedCategory
+      (c: Category) => c.name === data.suggestedCategory
     );
-    setForm((prev) => ({
+    setForm((prev: any) => ({
       ...prev,
       ...(data.totalAmount && { amount: data.totalAmount }),
       ...(data.merchantName && { description: data.merchantName }),
@@ -72,6 +105,8 @@ export default function TransactionForm({ onClose, initialData }: TransactionFor
     }));
     setShowScanner(false);
   };
+
+  const currencySymbol = getCurrencySymbol(form.transactionCurrency ?? globalCurrency);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -123,21 +158,39 @@ export default function TransactionForm({ onClose, initialData }: TransactionFor
             ))}
           </div>
 
-          {/* Amount */}
+          {/* Amount + Currency */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">&#8377;</span>
-              <input
-                type="number"
-                step="0.01"
-                className="input-field pl-8"
-                placeholder="0.00"
-                value={form.amount ?? ''}
-                onChange={(e) => setForm({ ...form, amount: parseFloat(e.target.value) || undefined })}
-                required
-              />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{currencySymbol}</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="input-field pl-8"
+                  placeholder="0.00"
+                  value={form.amount ?? ''}
+                  onChange={(e) => setForm({ ...form, amount: parseFloat(e.target.value) || undefined })}
+                  required
+                />
+              </div>
+              <select
+                className="input-field w-28"
+                value={form.transactionCurrency}
+                onChange={(e) => setForm({ ...form, transactionCurrency: e.target.value })}
+              >
+                {CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.symbol} {c.code}
+                  </option>
+                ))}
+              </select>
             </div>
+            {isDifferentCurrency && (
+              <p className="text-xs text-amber-600 mt-1">
+                Will be converted to {getCurrencySymbol(globalCurrency)} ({globalCurrency}) at current exchange rate
+              </p>
+            )}
           </div>
 
           {/* Description */}
@@ -163,7 +216,7 @@ export default function TransactionForm({ onClose, initialData }: TransactionFor
               required
             >
               <option value="">Select category</option>
-              {filteredCategories.map((cat) => (
+              {filteredCategories.map((cat: Category) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.icon} {cat.name}
                 </option>
@@ -199,8 +252,8 @@ export default function TransactionForm({ onClose, initialData }: TransactionFor
             <button type="button" onClick={onClose} className="btn-secondary flex-1">
               Cancel
             </button>
-            <button type="submit" className="btn-primary flex-1" disabled={createTransaction.isPending}>
-              {createTransaction.isPending ? 'Saving...' : 'Save Transaction'}
+            <button type="submit" className="btn-primary flex-1" disabled={createTransaction.isPending || isConverting}>
+              {isConverting ? 'Converting...' : createTransaction.isPending ? 'Saving...' : 'Save Transaction'}
             </button>
           </div>
         </form>

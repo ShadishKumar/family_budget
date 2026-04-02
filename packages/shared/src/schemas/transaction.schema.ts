@@ -3,6 +3,9 @@ import { z } from 'zod';
 export const createTransactionSchema = z.object({
   amount: z.number().positive('Amount must be positive'),
   currency: z.string().default('INR'),
+  originalAmount: z.number().positive().optional(),
+  originalCurrency: z.string().optional(),
+  exchangeRate: z.number().positive().optional(),
   description: z.string().min(1, 'Description is required').max(500),
   date: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
   type: z.enum(['INCOME', 'EXPENSE']),

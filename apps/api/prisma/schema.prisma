@@ -77,18 +77,21 @@ model Category {
 }
 
 model Transaction {
-  id          String   @id @default(uuid())
-  amount      Decimal  @db.Decimal(12, 2)
-  currency    String   @default("INR")
-  description String
-  date        DateTime
-  type        String
-  inputMethod String   @default("MANUAL")
-  receiptUrl  String?
-  ocrRawText  String?
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String   @id @default(uuid())
+  amount           Decimal  @db.Decimal(12, 2)
+  currency         String   @default("INR")
+  originalAmount   Decimal? @db.Decimal(12, 2)
+  originalCurrency String?
+  exchangeRate     Decimal? @db.Decimal(18, 8)
+  description      String
+  date             DateTime
+  type             String
+  inputMethod      String   @default("MANUAL")
+  receiptUrl       String?
+  ocrRawText       String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])

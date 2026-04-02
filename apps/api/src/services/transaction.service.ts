@@ -8,6 +8,9 @@ export class TransactionService {
       data: {
         amount: new Prisma.Decimal(data.amount),
         currency: data.currency,
+        originalAmount: data.originalAmount ? new Prisma.Decimal(data.originalAmount) : null,
+        originalCurrency: data.originalCurrency ?? null,
+        exchangeRate: data.exchangeRate ? new Prisma.Decimal(data.exchangeRate) : null,
         description: data.description,
         date: new Date(data.date),
         type: data.type,
