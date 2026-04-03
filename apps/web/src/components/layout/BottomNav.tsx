@@ -4,6 +4,7 @@ import {
   ArrowLeftRight,
   Landmark,
   TrendingUp,
+  Users,
   Settings,
 } from 'lucide-react';
 
@@ -11,7 +12,8 @@ const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
   { to: '/assets', icon: Landmark, label: 'Assets' },
-  { to: '/investments', icon: TrendingUp, label: 'Investments' },
+  { to: '/investments', icon: TrendingUp, label: 'Invest' },
+  { to: '/family', icon: Users, label: 'Family' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
