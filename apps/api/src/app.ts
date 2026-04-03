@@ -18,25 +18,27 @@ app.use(cors({
   credentials: true,
 }));
 
-// Rate limiting — strict on auth, general on all other API routes
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
-  message: { error: 'Too many attempts, please try again later' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Rate limiting — only in production to avoid blocking local dev
+if (process.env.NODE_ENV === 'production') {
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { error: 'Too many attempts, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
 
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 200,
-  message: { error: 'Too many requests, please try again later' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+  const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 200,
+    message: { error: 'Too many requests, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
 
-app.use('/api/auth', authLimiter);
-app.use('/api', apiLimiter);
+  app.use('/api/auth', authLimiter);
+  app.use('/api', apiLimiter);
+}
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
