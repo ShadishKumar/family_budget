@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
+import { AuthRequest } from '../middleware/auth';
 
 export class AuthController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -30,6 +31,14 @@ export class AuthController {
       const { refreshToken } = req.body;
       await AuthService.logout(refreshToken);
       res.json({ message: 'Logged out successfully' });
+    } catch (err) { next(err); }
+  }
+
+  static async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      await AuthService.changePassword(req.user!.userId, currentPassword, newPassword);
+      res.json({ message: 'Password changed successfully' });
     } catch (err) { next(err); }
   }
 }

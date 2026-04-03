@@ -24,7 +24,13 @@ export const inviteMemberSchema = z.object({
   role: z.enum(['ADMIN', 'MEMBER', 'VIEWER']).default('MEMBER'),
 });
 
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(8, 'New password must be at least 8 characters'),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type InviteMemberInput = z.infer<typeof inviteMemberSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

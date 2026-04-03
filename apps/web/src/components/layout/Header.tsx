@@ -8,7 +8,8 @@ interface HeaderProps {
 
 export default function Header({ title, subtitle, actions }: HeaderProps) {
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-4"
+            style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}>
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">{title}</h2>

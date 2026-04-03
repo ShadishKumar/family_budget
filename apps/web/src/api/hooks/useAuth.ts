@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import api from '../client';
 import { useAuthStore } from '../../store/authStore';
-import { LoginInput, RegisterInput } from '@family-budget/shared';
+import { LoginInput, RegisterInput, ChangePasswordInput } from '@family-budget/shared';
 
 export function useLogin() {
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -42,6 +42,15 @@ export function useLogout() {
     },
     onSettled: () => {
       logout();
+    },
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: async (data: ChangePasswordInput) => {
+      const res = await api.put('/auth/password', data);
+      return res.data;
     },
   });
 }
